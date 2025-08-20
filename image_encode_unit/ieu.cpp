@@ -120,7 +120,7 @@ void ReadWatermark(YCbCr(&data)[128 * 64]) {
 
 int main(int argc, char** argv) {
     if (argc < 3) {
-        perror("Wrong arguments.");
+        std::cout << "Wrong arguments" << std::endl;
         return 1;
     }
 

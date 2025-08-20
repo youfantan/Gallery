@@ -14,4 +14,7 @@ include_directories(include)
 find_package(JPEG REQUIRED)
 add_executable(image_encode_unit image_encode_unit/ieu.h
         image_encode_unit/ieu.cpp)
+add_executable(image_scale_unit image_scale_unit/isu.h
+        image_scale_unit/isu.cpp)
 target_link_libraries(image_encode_unit PRIVATE JPEG::JPEG)
+target_link_libraries(image_scale_unit PRIVATE JPEG::JPEG)
