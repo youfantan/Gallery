@@ -139,6 +139,7 @@ int main(int argc, char** argv) {
     cinfo.err = jpeg_std_error(&jerr);
     jpeg_create_decompress(&cinfo);
     jpeg_stdio_src(&cinfo, fp);
+    jpeg_save_markers(&cinfo, JPEG_APP0 + 1, 0xFFFF);
     jpeg_read_header(&cinfo, TRUE);
 
     jvirt_barray_ptr* coef_arrays = jpeg_read_coefficients(&cinfo);
@@ -183,15 +184,20 @@ int main(int argc, char** argv) {
         }
     }
 
-    struct jpeg_compress_struct cinfo_out;
-    struct jpeg_error_mgr jerr_out;
+    jpeg_compress_struct cinfo_out;
+    jpeg_error_mgr jerr_out;
     cinfo_out.err = jpeg_std_error(&jerr_out);
     jpeg_create_compress(&cinfo_out);
     jpeg_stdio_dest(&cinfo_out, fp_out);
-
     jpeg_copy_critical_parameters(&cinfo, &cinfo_out);
     jpeg_write_coefficients(&cinfo_out, coef_arrays);
-
+    jpeg_saved_marker_ptr marker;
+    for (marker = cinfo.marker_list; marker != nullptr; marker = marker->next) {
+        if (marker->marker == JPEG_APP0 + 1) {
+            jpeg_write_marker(&cinfo_out, marker->marker,
+                              marker->data, marker->data_length);
+        }
+    }
     jpeg_finish_compress(&cinfo_out);
     jpeg_destroy_compress(&cinfo_out);
 
